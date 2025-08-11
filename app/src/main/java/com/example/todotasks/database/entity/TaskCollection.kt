@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "task_collection")
 data class TaskCollection(
     @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
+    val id: Long? = null,
     @ColumnInfo(name = "title")
     val title: String,
     @ColumnInfo(name = "update_at")

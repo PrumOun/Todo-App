@@ -12,10 +12,10 @@ import com.example.todotasks.database.entity.TaskEntity
 @Dao
 interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTaskCollection(taskCollection: TaskCollection)
+    suspend fun insertTaskCollection(taskCollection: TaskCollection): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: TaskEntity)
+    suspend fun insertTask(task: TaskEntity): Long
 
     @Query("SELECT * FROM task_collection")
     suspend fun getAllTaskCollections(): List<TaskCollection>
