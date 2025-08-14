@@ -63,6 +63,8 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     // Data Store
     implementation(libs.androidx.datastore.preferences)
+    // Lottie
+    implementation(libs.lottie.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
