@@ -3,11 +3,13 @@ package com.example.todotasks.ui.pagertab
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import com.example.todotasks.TaskDelegate
 import com.example.todotasks.ui.pagertab.state.TabUiState
 import com.example.todotasks.ui.pagertab.state.TaskGroupUiState
@@ -24,6 +26,14 @@ fun PagerTabLayout(
     var pageCount by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { pageCount }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            pagerState.currentPage
+        }.collect { currentPage ->
+            taskDelegate.updateCurrentCollectionIndex(currentPage)
+        }
+    }
 
     pageCount = state.size
     MyTabRowLayout(

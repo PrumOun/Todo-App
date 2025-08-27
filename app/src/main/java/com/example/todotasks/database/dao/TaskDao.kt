@@ -20,18 +20,18 @@ interface TaskDao {
     @Query("SELECT * FROM task_collection")
     suspend fun getAllTaskCollections(): List<TaskCollection>
     @Query("SELECT * FROM task WHERE collection_id = :collectionId")
-    suspend fun getTasksByCollectionId(collectionId: Int): List<TaskEntity>
+    suspend fun getTasksByCollectionId(collectionId: Long): List<TaskEntity>
 
     @Query("UPDATE task SET is_favorite = :isFavorite WHERE id = :taskId")
-    suspend fun updateTaskFavoriteStatus(taskId: Int, isFavorite: Boolean)
+    suspend fun updateTaskFavoriteStatus(taskId: Long, isFavorite: Boolean) : Int
     @Query("UPDATE task SET is_completed = :isCompleted WHERE id = :taskId")
-    suspend fun updateTaskCompletionStatus(taskId: Int, isCompleted: Boolean)
+    suspend fun updateTaskCompletionStatus(taskId: Long?, isCompleted: Boolean): Int
     @Query("UPDATE task_collection SET title = :title WHERE id = :collectionId")
-    suspend fun updateTaskCollectionTitle(collectionId: Int, title: String)
+    suspend fun updateTaskCollectionTitle(collectionId: Int, title: String): Int
     @Update
     suspend fun updateTask(task: TaskEntity)
     @Update
-    suspend fun updateTaskCollection(taskCollection: TaskCollection)
+    suspend fun updateTaskCollection(taskCollection: TaskCollection): Int
 
     @Delete
     suspend fun deleteTask(task: TaskEntity)

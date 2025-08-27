@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.todotasks.TaskDelegate
 import com.example.todotasks.ui.pagertab.state.TaskUiState
+import androidx.compose.runtime.key
+import androidx.compose.ui.util.fastForEachIndexed
 
 @Composable
 fun CompletedTaskListSection(
@@ -32,21 +34,15 @@ fun CompletedTaskListSection(
                     color = Color.Black.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(12.dp)
                 )
-                .padding(12.dp)
+                .padding(vertical = 12.dp)
                 .animateContentSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            completedTaskList.forEach {
-                TaskItemLayout(it, onCompleteTask = { taskState ->
-                    taskDelegate.onTaskCompleteClick(taskState)
-                    Log.d("TaskItemLayout", "onCompleteTask: $taskState")
-                }, onTaskClicked = { taskState ->
-                    Log.d("TaskItemLayout", "onTaskClicked: $taskState")
-                }, onTaskFavorite = { taskState ->
-                    taskDelegate.onTaskFavoriteClick(taskState)
-                    Log.d("TaskItemLayout", "onTaskFavorite: $taskState")
-                })
+            completedTaskList.fastForEachIndexed { _, taskUiState ->
+                key(taskUiState.id){
+                    TaskItemLayout(taskUiState, taskDelegate)
+                }
             }
         }
     }

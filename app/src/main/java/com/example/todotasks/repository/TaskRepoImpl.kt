@@ -14,7 +14,7 @@ class TaskRepoImpl @Inject constructor(
     override suspend fun getAllTaskCollections(): List<TaskCollection> = withContext(Dispatchers.IO){
         taskDao.getAllTaskCollections()
     }
-    override suspend fun getTaskByCollectionId(collectionId: Int): List<TaskEntity> = withContext(Dispatchers.IO) {
+    override suspend fun getTaskByCollectionId(collectionId: Long): List<TaskEntity> = withContext(Dispatchers.IO) {
         taskDao.getTasksByCollectionId(collectionId)
     }
     override suspend fun addTaskCollection(title: String): TaskCollection? {
@@ -26,10 +26,10 @@ class TaskRepoImpl @Inject constructor(
             null
         }
     }
-    override suspend fun addTask(title: String, collectionId: Int): TaskEntity? {
-        val task = TaskEntity(title = title, collectionId = collectionId, isCompleted = false, isFavorite = false, updatedAt = Calendar.getInstance().timeInMillis)
+    override suspend fun addTask(content: String, collectionId: Long): TaskEntity? = withContext(Dispatchers.IO) {
+        val task = TaskEntity(content = content, collectionId = collectionId, isCompleted = false, isFavorite = false, updatedAt = Calendar.getInstance().timeInMillis)
         val id = taskDao.insertTask(task)
-        return if(id > 0) {
+        return@withContext if(id > 0) {
             task.copy(id = id)
         } else {
             null
@@ -39,8 +39,16 @@ class TaskRepoImpl @Inject constructor(
         taskDao.updateTask(task)
         return@withContext true
     }
+
+    override suspend fun updateTaskCompleted(taskId: Long, isCompleted: Boolean): Boolean = withContext(Dispatchers.IO){
+        taskDao.updateTaskCompletionStatus(taskId, isCompleted) > 0
+    }
+
+    override suspend fun updateTaskFavorite(taskId: Long, isFavorite: Boolean): Boolean = withContext(Dispatchers.IO) {
+        taskDao.updateTaskFavoriteStatus(taskId, isFavorite) > 0
+    }
+
     override suspend fun updateTaskCollection(taskCollection: TaskCollection): Boolean = withContext(Dispatchers.IO) {
-        taskDao.updateTaskCollection(taskCollection)
-        return@withContext true
+        taskDao.updateTaskCollection(taskCollection) > 0
     }
 }

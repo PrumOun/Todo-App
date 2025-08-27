@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "task")
 data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = null,
-    @ColumnInfo(name = "title")
-    val title: String,
+    val id: Long = 0,
+    @ColumnInfo(name = "content")
+    val content: String,
     @ColumnInfo(name = "is_completed")
     val isCompleted: Boolean,
     @ColumnInfo(name = "is_favorite")
     val isFavorite: Boolean,
     @ColumnInfo(name = "collection_id")
-    val collectionId: Int,
+    val collectionId: Long,
     @ColumnInfo(name = "updated_at")
     val updatedAt: Long
 )
