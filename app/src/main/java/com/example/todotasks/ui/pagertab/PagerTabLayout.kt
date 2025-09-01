@@ -6,10 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import com.example.todotasks.ID_ADD_NEW_LIST
 import com.example.todotasks.TaskDelegate
 import com.example.todotasks.ui.pagertab.state.TabUiState
 import com.example.todotasks.ui.pagertab.state.TaskGroupUiState
@@ -24,24 +26,35 @@ fun PagerTabLayout(
     taskDelegate: TaskDelegate
 ) {
     var pageCount by remember { mutableIntStateOf(0) }
+    var internalState by remember { mutableStateOf(state) }
+    internalState = state
     val pagerState = rememberPagerState { pageCount }
     val scope = rememberCoroutineScope()
+    pageCount = state.count {
+        it.tab.id != ID_ADD_NEW_LIST
+    }
 
     LaunchedEffect(Unit) {
         snapshotFlow {
             pagerState.currentPage
         }.collect { currentPage ->
-            taskDelegate.updateCurrentCollectionIndex(currentPage)
+            internalState.getOrNull(currentPage)?.tab?.id?.let { currentCollectionId ->
+                taskDelegate.updateCurrentCollectionId(currentCollectionId)
+            }
         }
     }
 
-    pageCount = state.size
     MyTabRowLayout(
         selectedTabIndex = pagerState.currentPage,
         listTabs = state.map { it.tab },
         onTabSelected = { index ->
-            scope.launch {
-                pagerState.scrollToPage(index)
+            if ((state.getOrNull(index)?.tab?.id ?: 0) == ID_ADD_NEW_LIST) {
+                // Clicked on "＋ New List" tab
+                taskDelegate.requestAddNewCollection()
+            }else{
+                scope.launch {
+                    pagerState.scrollToPage(index)
+                }
             }
         }
     )

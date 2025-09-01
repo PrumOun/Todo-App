@@ -65,6 +65,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     // Lottie
     implementation(libs.lottie.compose)
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

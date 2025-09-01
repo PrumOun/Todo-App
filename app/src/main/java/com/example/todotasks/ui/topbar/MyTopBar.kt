@@ -15,9 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.todotasks.TaskDelegate
 
 @Composable
-fun MyTopBar(
-    taskDelegate: TaskDelegate
-) {
+fun MyTopBar() {
     Box(
         modifier = Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp)
     ) {
@@ -26,11 +24,11 @@ fun MyTopBar(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.align(Alignment.Center)
         )
-        Button(
-            onClick = {
-            taskDelegate.requestAddNewCollection()
-        }) {
-            Text("+ New List")
-        }
+//        Button(
+//            onClick = {
+//            taskDelegate.requestAddNewCollection()
+//        }) {
+//            Text("+ New List")
+//        }
     }
 }
