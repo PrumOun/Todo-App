@@ -1,5 +1,6 @@
 package com.example.todotasks.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.todotasks.MainEvent
 import com.example.todotasks.MainViewModel
+import com.example.todotasks.ui.MenuActiveCollection
 import com.example.todotasks.ui.floataction.MyFloatActionButton
 import com.example.todotasks.ui.pagertab.PagerTabLayout
 import com.example.todotasks.ui.topbar.MyTopBar
@@ -37,11 +39,16 @@ fun HomePage(
     var isShowAddTaskBottomSheet by remember{ mutableStateOf(false) }
     var isShowAddTaskCollectionBottomSheet by remember{ mutableStateOf(false) }
 
+    var isShowMenuActiveCollection by remember { mutableStateOf<List<MenuActiveCollection>?>(null) }
     LaunchedEffect(Unit) {
         mainViewModel.eventFlow.collect {
             when(it){
                 MainEvent.RequestAddNewCollection -> {
                     isShowAddTaskCollectionBottomSheet = true
+                }
+                is MainEvent.RequestBottomSheetOption -> {
+                    Log.d("HomePage", "Received RequestBottomSheetOption event for taskId: ${it}" )
+                    isShowMenuActiveCollection = it.list
                 }
             }
         }
@@ -63,7 +70,10 @@ fun HomePage(
             MyTopBar()
 
             if (listTabGroup.isNotEmpty()) {
-                PagerTabLayout(listTabGroup, taskDelegate)
+                PagerTabLayout(
+                    listTabGroup,
+                    taskDelegate,
+                )
             } else {
                 Text("NO TASKS AVAILABLE!!!")
             }
@@ -110,6 +120,22 @@ fun HomePage(
                         isShowAddTaskCollectionBottomSheet = false
                     }, modifier = Modifier.fillMaxWidth()) {
                         Text("Add Task Collection")
+                    }
+                }
+            }
+
+            if (!isShowMenuActiveCollection.isNullOrEmpty()){
+                ModalBottomSheet({
+                    isShowMenuActiveCollection = null
+                }) {
+                    Text("Menu Active Collection", modifier = Modifier.fillMaxWidth())
+                    isShowMenuActiveCollection?.forEach { menuItem ->
+                        Button({
+                            menuItem.action.invoke()
+                            isShowMenuActiveCollection = null
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            Text(menuItem.name)
+                        }
                     }
                 }
             }

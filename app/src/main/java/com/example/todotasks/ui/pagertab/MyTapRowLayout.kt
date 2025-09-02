@@ -15,45 +15,45 @@ import com.example.todotasks.ui.pagertab.state.TabUiState
 fun MyTabRowLayout(
     selectedTabIndex: Int,
     listTabs: List<TabUiState>,
-    onTabSelected: (Int) -> Unit = {}
+    onTabSelected: (Int) -> Unit = {},
+    onTabLongPressed: (TabUiState) -> Unit = {}
 ){
-    if(listTabs.size <= 3){
-        TabRow(
-            selectedTabIndex = selectedTabIndex,
-            modifier = Modifier.fillMaxWidth(),
-            indicator = { tabPositions ->
-                TabRowDefaults.PrimaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    width = Dp.Unspecified
-                )
-            }) {
-            repeat(listTabs.size) { tabIndex ->
-                TabItemLayout(
-                    state = listTabs[tabIndex],
-                    isSelected = selectedTabIndex == tabIndex,
-                    onTabSelected = { onTabSelected(tabIndex) }
-                )
-            }
-        }
-    }else{
-        ScrollableTabRow(
-            selectedTabIndex = selectedTabIndex,
-            modifier = Modifier.fillMaxWidth(),
-            edgePadding = 4.dp,
-            indicator = { tabPositions ->
-                TabRowDefaults.PrimaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                    width = Dp.Unspecified
-                )
-            }) {
-            repeat(listTabs.size) { tabIndex ->
-                TabItemLayout(
-                    state = listTabs[tabIndex],
-                    isSelected = selectedTabIndex == tabIndex,
-                    onTabSelected = { onTabSelected(tabIndex) }
-                )
-            }
+    val isScrollable = listTabs.size > 3
+    val rowModifier = Modifier.fillMaxWidth()
+
+    val rowContent: @Composable () -> Unit = {
+        repeat(listTabs.size) { index ->
+            TabItemLayout(
+                state = listTabs[index],
+                isSelected = selectedTabIndex == index,
+                onTabSelected = { onTabSelected(index) },
+                onTabLongPressed = { onTabLongPressed(listTabs[index]) }
+            )
         }
     }
 
+    if (isScrollable) {
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            modifier = rowModifier,
+            edgePadding = 4.dp,
+            indicator = { tabPositions ->
+                TabRowDefaults.PrimaryIndicator(
+                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                )
+            },
+            tabs = rowContent
+        )
+    } else {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            modifier = rowModifier,
+            indicator = { tabPositions ->
+                TabRowDefaults.PrimaryIndicator(
+                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+                )
+            },
+            tabs = rowContent
+        )
+    }
 }

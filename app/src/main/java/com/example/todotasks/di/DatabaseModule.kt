@@ -3,8 +3,6 @@ package com.example.todotasks.di
 import android.content.Context
 import com.example.todotasks.database.AppDatabase
 import com.example.todotasks.database.dao.TaskDao
-import com.example.todotasks.repository.TaskRepo
-import com.example.todotasks.repository.TaskRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

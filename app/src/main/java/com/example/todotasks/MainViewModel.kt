@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todotasks.repository.TaskRepo
+import com.example.todotasks.ui.MenuActiveCollection
 import com.example.todotasks.ui.pagertab.state.TabUiState
 import com.example.todotasks.ui.pagertab.state.TaskGroupUiState
 import com.example.todotasks.ui.pagertab.state.TaskPageUiState
@@ -84,7 +85,7 @@ class MainViewModel @Inject constructor(
     override fun onTaskCompleteClick(taskUiState: TaskUiState) {
         viewModelScope.launch(Dispatchers.IO) {
             val newTaskUiState = taskUiState.copy(isCompleted = !taskUiState.isCompleted)
-            if (!taskRepo.updateTaskCompleted(taskUiState.id, taskUiState.isCompleted)) {
+            if (!taskRepo.updateTaskCompleted(newTaskUiState.id, newTaskUiState.isCompleted)) {
                 Log.e("MainViewModel", "Failed to update task completed")
                 return@launch
             }
@@ -196,6 +197,29 @@ class MainViewModel @Inject constructor(
             _eventFlow.emit(MainEvent.RequestAddNewCollection)
         }
     }
+
+    override fun requestUpdateCollection(collectionId: Long) {
+        val actionList = listOf(
+            MenuActiveCollection("Edit"){
+                Log.d("MainViewModel", "Edit collectionId: $collectionId" )
+            },
+            MenuActiveCollection("Delete"){
+                Log.d("MainViewModel", "Delete collectionId: $collectionId" )
+                deleteCollection(collectionId)
+            }
+        )
+        viewModelScope.launch {
+            _eventFlow.emit(MainEvent.RequestBottomSheetOption(actionList))
+        }
+    }
+
+    override fun deleteCollection(collectionId: Long) {
+        viewModelScope.launch {
+            if (taskRepo.deleteTaskCollectionById(collectionId)){
+                _listTabGroup.value = _listTabGroup.value.filter { it.tab.id != collectionId }
+            }
+        }
+    }
 }
 
 interface TaskDelegate{
@@ -205,9 +229,12 @@ interface TaskDelegate{
     fun updateCurrentCollectionId(collectionId: Long) = Unit
     fun currentCollectionId(): Long = -1L
     fun addNewCollection(title: String) = Unit
+    fun deleteCollection(collectionId: Long) = Unit
     fun requestAddNewCollection() {}
+    fun requestUpdateCollection(collectionId: Long) {}
 }
 
 sealed class MainEvent{
     data object RequestAddNewCollection: MainEvent()
+    data class RequestBottomSheetOption(val list: List<MenuActiveCollection>): MainEvent()
 }

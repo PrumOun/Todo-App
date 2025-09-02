@@ -23,6 +23,7 @@ import com.example.todotasks.ui.pagertab.state.TaskPageUiState
 
 @Composable
 fun TaskListPage(
+    collectionId: Long,
     state: TaskPageUiState,
     taskDelegate: TaskDelegate
 ) {
@@ -34,7 +35,7 @@ fun TaskListPage(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ActiveTaskListSection(state.activeTaskList, taskDelegate)
+        ActiveTaskListSection(collectionId, state.activeTaskList, taskDelegate)
         CompletedTaskListSection(state.completedTaskList, taskDelegate)
     }
 }

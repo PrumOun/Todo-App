@@ -1,5 +1,6 @@
 package com.example.todotasks.ui.pagertab
 
+import android.util.Log
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -23,7 +24,7 @@ import java.util.Calendar
 @Composable
 fun PagerTabLayout(
     state: List<TaskGroupUiState>,
-    taskDelegate: TaskDelegate
+    taskDelegate: TaskDelegate,
 ) {
     var pageCount by remember { mutableIntStateOf(0) }
     var internalState by remember { mutableStateOf(state) }
@@ -54,6 +55,15 @@ fun PagerTabLayout(
             }else{
                 scope.launch {
                     pagerState.scrollToPage(index)
+                    Log.d("PagerTabLayout", "Switched to tab index: $index" )
+                }
+            }
+        },
+        onTabLongPressed = {tab ->
+            if (tab.id > 0){
+                scope.launch {
+                    taskDelegate.requestUpdateCollection(tab.id)
+                    Log.d("PagerTabLayout", "Long pressed on tab id: ${tab.id}" )
                 }
             }
         }
@@ -64,6 +74,7 @@ fun PagerTabLayout(
         beyondViewportPageCount = 2
     ){ pageIndex ->
         TaskListPage(
+            collectionId = state[pageIndex].tab.id,
             state = state[pageIndex].page,
             taskDelegate = taskDelegate
         )
