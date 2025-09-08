@@ -40,6 +40,7 @@ fun HomePage(
     var isShowAddTaskCollectionBottomSheet by remember{ mutableStateOf(false) }
 
     var isShowMenuActiveCollection by remember { mutableStateOf<List<MenuActiveCollection>?>(null) }
+
     LaunchedEffect(Unit) {
         mainViewModel.eventFlow.collect {
             when(it){

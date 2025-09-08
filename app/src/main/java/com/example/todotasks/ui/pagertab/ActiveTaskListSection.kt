@@ -83,7 +83,9 @@ fun ActiveTaskListSection(
                 Text(
                     "S",
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.clickable {  }.padding(vertical = 4.dp, horizontal = 8.dp)
+                    modifier = Modifier.clickable {
+                        taskDelegate.requestSortTasks(collectionId)
+                    }.padding(vertical = 4.dp, horizontal = 8.dp)
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 if (collectionId > 0){

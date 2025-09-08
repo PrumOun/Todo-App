@@ -2,6 +2,7 @@ package com.example.todotasks.repository
 
 import android.icu.util.Calendar
 import com.example.todotasks.database.dao.TaskDao
+import com.example.todotasks.database.entity.SortType
 import com.example.todotasks.database.entity.TaskCollection
 import com.example.todotasks.database.entity.TaskEntity
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,8 @@ class TaskRepoImpl @Inject constructor(
         taskDao.getTasksByCollectionId(collectionId)
     }
     override suspend fun addTaskCollection(title: String): TaskCollection? {
-        val taskCollection = TaskCollection(title = title, updateAt = Calendar.getInstance().timeInMillis)
+        val now = Calendar.getInstance().timeInMillis
+        val taskCollection = TaskCollection(title = title, updateAt = now, sortType = SortType.CREATED_DATE.value)
         val id = taskDao.insertTaskCollection(taskCollection)
         return if(id > 0) {
             taskCollection.copy(id = id)
@@ -54,5 +56,11 @@ class TaskRepoImpl @Inject constructor(
 
     override suspend fun deleteTaskCollectionById(collectionId: Long): Boolean = withContext(Dispatchers.IO) {
         taskDao.deleteTaskCollectionById(collectionId) > 0
+    }
+
+    override suspend fun updateCollectionSortType(collectionId: Long, sortType: SortType): Boolean {
+        return withContext(Dispatchers.IO) {
+            taskDao.updateCollectionSortType(collectionId, sortType = sortType.value) > 0
+        }
     }
 }

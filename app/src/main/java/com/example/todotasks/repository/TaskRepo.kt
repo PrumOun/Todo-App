@@ -1,5 +1,6 @@
 package com.example.todotasks.repository
 
+import com.example.todotasks.database.entity.SortType
 import com.example.todotasks.database.entity.TaskCollection
 import com.example.todotasks.database.entity.TaskEntity
 
@@ -12,5 +13,6 @@ interface TaskRepo {
     suspend fun updateTaskCompleted(taskId: Long, isCompleted: Boolean): Boolean
     suspend fun updateTaskCollection(taskCollection: TaskCollection): Boolean
     suspend fun updateTaskFavorite(taskId: Long, isFavorite: Boolean): Boolean
+    suspend fun updateCollectionSortType(collectionId: Long, sortType: SortType): Boolean
     suspend fun deleteTaskCollectionById(collectionId: Long): Boolean
 }
