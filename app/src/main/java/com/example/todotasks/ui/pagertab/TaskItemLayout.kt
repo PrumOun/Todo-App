@@ -1,5 +1,8 @@
 package com.example.todotasks.ui.pagertab
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,17 +21,22 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.todotasks.TaskDelegate
+import com.example.todotasks.ui.pagertab.items.itemBgColor
 import com.example.todotasks.ui.pagertab.state.TaskUiState
 
 @Composable
-fun TaskItemLayout(
+fun LazyItemScope.TaskItemLayout(
     state: TaskUiState,
     taskDelegate: TaskDelegate
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {},
+        modifier = Modifier.fillMaxWidth().clickable {}
+            .background(color = itemBgColor)
+            .animateItem(
+                tween(easing = LinearEasing),
+                tween(easing = LinearEasing),
+                tween(easing = LinearEasing)
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
@@ -57,7 +66,6 @@ fun TaskItemLayout(
         }
         if(!state.isCompleted){
             Text(if (state.isFavorite) "👍" else "👎", modifier = Modifier
-                .padding(6.dp)
                 .clickable {
                     taskDelegate.onTaskFavoriteClick(state)
                 })
@@ -65,19 +73,19 @@ fun TaskItemLayout(
     }
 }
 
-@Preview
-@Composable
-fun TaskItemLayoutPreview() {
-    TaskItemLayout(
-        TaskUiState(
-            content = "Task 1",
-            isCompleted = false,
-            isFavorite = true,
-            collectionId = 1,
-            id = 1,
-            updatedAt = 0L,
-            stringUpdatedAt = "2025-02-22"
-        ),
-        taskDelegate = object : TaskDelegate {}
-    )
-}
+//@Preview
+//@Composable
+//fun TaskItemLayoutPreview() {
+//    TaskItemLayout(
+//        TaskUiState(
+//            content = "Task 1",
+//            isCompleted = false,
+//            isFavorite = true,
+//            collectionId = 1,
+//            id = 1,
+//            updatedAt = 0L,
+//            stringUpdatedAt = "2025-02-22"
+//        ),
+//        taskDelegate = object : TaskDelegate {}
+//    )
+//}
