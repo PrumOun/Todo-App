@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,6 +138,41 @@ fun HomePage(
                         }, modifier = Modifier.fillMaxWidth()) {
                             Text(menuItem.name)
                         }
+                    }
+                }
+            }
+
+            val editingCollectionId by mainViewModel.editingCollectionId.collectAsState()
+
+            if (editingCollectionId != null){
+                val editingCollection = listTabGroup.find { it.tab.id == editingCollectionId }
+
+                var inputTaskCollection by remember {
+                    mutableStateOf(editingCollection?.tab?.title ?: "")
+                }
+
+                ModalBottomSheet(
+                    onDismissRequest = { mainViewModel.clearEditing() } // add helper
+                ) {
+                    Text("Edit Task Collection", modifier = Modifier.fillMaxWidth())
+                    TextField(
+                        value = inputTaskCollection,
+                        onValueChange = { inputTaskCollection = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Button(
+                        onClick = {
+                            if (inputTaskCollection.isNotEmpty() && editingCollection != null) {
+                                mainViewModel.updateCollectionTitle(
+                                    editingCollection.tab.id,
+                                    inputTaskCollection
+                                )
+                            }
+                            mainViewModel.clearEditing()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Update Task Collection")
                     }
                 }
             }

@@ -31,10 +31,13 @@ fun PagerTabLayout(
     internalState = state
     val pagerState = rememberPagerState { pageCount }
     val scope = rememberCoroutineScope()
+    var pendingScrollToNew by remember { mutableStateOf(false) }
+    val lastCollectionCount = remember { mutableIntStateOf(state.size) }
     pageCount = state.count {
         it.tab.id != ID_ADD_NEW_LIST
     }
 
+    // Keep current collection id in sync
     LaunchedEffect(Unit) {
         snapshotFlow {
             pagerState.currentPage
@@ -45,13 +48,25 @@ fun PagerTabLayout(
         }
     }
 
+    // When state size changes and a new collection was just added, scroll to it
+    LaunchedEffect(state.size) {
+        if (pendingScrollToNew && state.isNotEmpty()) {
+            val newIndex = state.lastIndex
+            pagerState.animateScrollToPage(newIndex)
+            pendingScrollToNew = false
+        }
+        lastCollectionCount.intValue = state.size
+    }
+
     MyTabRowLayout(
         selectedTabIndex = pagerState.currentPage,
         listTabs = state.map { it.tab },
         onTabSelected = { index ->
-            if ((state.getOrNull(index)?.tab?.id ?: 0) == ID_ADD_NEW_LIST) {
+            val selectedTabId = state.getOrNull(index)?.tab?.id ?: 0
+            if (selectedTabId == ID_ADD_NEW_LIST) {
                 // Clicked on "＋ New List" tab
                 taskDelegate.requestAddNewCollection()
+                pendingScrollToNew = true // to scroll once state updates
             }else{
                 scope.launch {
                     pagerState.scrollToPage(index)

@@ -15,4 +15,5 @@ interface TaskRepo {
     suspend fun updateTaskFavorite(taskId: Long, isFavorite: Boolean): Boolean
     suspend fun updateCollectionSortType(collectionId: Long, sortType: SortType): Boolean
     suspend fun deleteTaskCollectionById(collectionId: Long): Boolean
+    suspend fun updateTasksCollectionTitle(collectionId: Long, newTitle: String): Boolean
 }

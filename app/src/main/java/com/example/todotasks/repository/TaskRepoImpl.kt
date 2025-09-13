@@ -54,13 +54,18 @@ class TaskRepoImpl @Inject constructor(
         taskDao.updateTaskCollection(taskCollection) > 0
     }
 
-    override suspend fun deleteTaskCollectionById(collectionId: Long): Boolean = withContext(Dispatchers.IO) {
-        taskDao.deleteTaskCollectionById(collectionId) > 0
+    override suspend fun deleteTaskCollectionById(collectionId: Long): Boolean {
+        taskDao.deleteTaskCollectionWithTasks(collectionId)
+        return true
     }
 
     override suspend fun updateCollectionSortType(collectionId: Long, sortType: SortType): Boolean {
         return withContext(Dispatchers.IO) {
             taskDao.updateCollectionSortType(collectionId, sortType = sortType.value) > 0
         }
+    }
+
+    override suspend fun updateTasksCollectionTitle(collectionId: Long, newTitle: String): Boolean = withContext(Dispatchers.IO) {
+        taskDao.updateTaskCollectionTitle(collectionId, newTitle) > 0
     }
 }

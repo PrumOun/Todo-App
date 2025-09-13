@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -206,10 +207,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private val _editingCollectionId = MutableStateFlow<Long?>(null)
+    val editingCollectionId: StateFlow<Long?> = _editingCollectionId
+
     override fun requestUpdateCollection(collectionId: Long) {
         val actionList = listOf(
             MenuActiveCollection("Edit"){
                 Log.d("MainViewModel", "Edit collectionId: $collectionId" )
+                _editingCollectionId.value = collectionId
             },
             MenuActiveCollection("Delete"){
                 Log.d("MainViewModel", "Delete collectionId: $collectionId" )
@@ -219,6 +224,28 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _eventFlow.emit(MainEvent.RequestBottomSheetOption(actionList))
         }
+    }
+
+    override fun updateCollectionTitle(collectionId: Long, newTitle: String) {
+        viewModelScope.launch {
+            if (taskRepo.updateTasksCollectionTitle(collectionId, newTitle)) {
+                _listTabGroup.value.let { listTabs ->
+                    val newTabGroup = listTabs.map { tabGroup ->
+                        if (tabGroup.tab.id == collectionId) {
+                            tabGroup.copy(tab = tabGroup.tab.copy(title = newTitle))
+                        } else {
+                            tabGroup
+                        }
+                    }
+                    _listTabGroup.value = newTabGroup
+                }
+            }
+            _editingCollectionId.value = null
+        }
+    }
+
+    override fun clearEditing() {
+        _editingCollectionId.value = null
     }
 
     override fun deleteCollection(collectionId: Long) {
@@ -262,9 +289,6 @@ class MainViewModel @Inject constructor(
             )
         }
     }
-
-    override fun renameCollection(collectionId: Long, newTitle: String) {
-    }
 }
 
 interface TaskDelegate{
@@ -275,7 +299,8 @@ interface TaskDelegate{
     fun currentCollectionId(): Long = -1L
     fun addNewCollection(title: String) = Unit
     fun deleteCollection(collectionId: Long) = Unit
-    fun renameCollection(collectionId: Long, newTitle: String) = Unit
+    fun updateCollectionTitle(collectionId: Long, newTitle: String) = Unit
+    fun clearEditing() = Unit
     fun requestAddNewCollection() {}
     fun requestUpdateCollection(collectionId: Long) {}
     fun requestSortTasks(collectionId: Long) = Unit
